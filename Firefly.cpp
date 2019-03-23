@@ -145,6 +145,15 @@ void replace_ffa()
 			ffa[i][j] = ffa_tmp[Index[i]][j];
 		}
 	}
+	
+	// Leave ffa_tmp==ffa, for correct use in line 197..without this ffa_tmp!=ffa, not sorted..
+	for(i=0;i<n;i++)
+	{
+		for(j=0;j<D;j++)
+		{
+			ffa_tmp[i][j] = ffa[i][j]; 
+		}
+	}
 }
 
 void findlimits(int k)
@@ -168,13 +177,13 @@ void move_ffa()
 
 	for(i=0;i<n;i++)
 	{
-		scale = abs(ub[i]-lb[i]);
+		
 		for(j=0;j<n;j++)
 		{
 			r = 0.0;
 			for(k=0;k<D;k++)
 			{
-				r += (ffa[i][k]-ffa[j][k])*(ffa[i][k]-ffa[j][k]);
+				r += (ffa[i][k]-ffa_tmp[j][k])*(ffa[i][k]-ffa_tmp[j][k]);//ffa is reasigned if the following if() is true....
 			}
 			r = sqrt(r);
 			if(I[i] > I[j])	// brighter and more attractive
@@ -182,10 +191,10 @@ void move_ffa()
 				double beta0 = 1.0;
 				beta = (beta0-betamin)*exp(-gama*pow(r, 2.0))+betamin;
 				for(k=0;k<D;k++)
-				{
+				{	scale = abs(ub[k]-lb[k]);// Indexed from D(dimension) not n(num of fireflies)
 					r = (   (double)rand() / ((double)(RAND_MAX)+(double)(1)) );
 					double tmpf = alpha*(r-0.5)*scale;
-					ffa[i][k] = ffa[i][k]*(1.0-beta)+ffa_tmp[j][k]*beta+tmpf;
+					ffa[i][k] = ffa[i][k]*(1.0-beta)+ffa_tmp[j][k]*beta+tmpf;// ffa_tmp corrected in line 149
 				}
 			}
 		}
